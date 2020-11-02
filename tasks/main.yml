@@ -1,0 +1,53 @@
+---
+#sonarqube needs java11
+- include_tasks: java11.yml
+#create sonar user as sonarqube cant be ran as a root
+- name: Create the sonar user for running the Sonarqube services
+  user:
+    name: sonar
+    comment: System user for running Sonarqube
+- name: Download Sonar.
+  get_url:
+    url: "{{ sonar_download_url }}"
+    dest: "{{ workspace }}/{{ sonar_version_directory }}.zip"
+    validate_certs: "{{ sonar_download_validate_certs }}"
+
+- name: Unzip Sonar.
+  unarchive:
+    src: "{{ workspace }}/{{ sonar_version_directory }}.zip"
+    dest: /usr/local/
+    remote_src: yes
+
+- name: Link this version of sonarqube as the server Sonarqube version
+  file:
+        src: "{{ workspace }}/{{ sonar_version_directory }}"
+        dest: "/usr/local/sonarqube"
+        state: link
+        owner: sonar
+
+- name: Configure Sonarqube to run as the sonar user
+  lineinfile:
+        path: "/usr/local/sonarqube/bin/linux-x86-64/sonar.sh"
+        regexp: "RUN_AS_USER=sonar"
+        insertafter: "#RUN_AS_USER="
+        line: "RUN_AS_USER=sonar"
+- name: Copy the Sonarqube service configuration file
+  copy:
+        src: "templates//sonar.unit.j2"
+        dest: "/etc/systemd/system/sonarqube.service"
+
+- name: setting java11 path for sonar wrapper
+  lineinfile:
+    path: /usr/local/{{ sonar_version_directory }}/conf/wrapper.conf
+    regexp: '^wrapper.java.command='
+    line: wrapper.java.command= /usr/lib/jvm/java-11-openjdk-11.0.8.10-0.el7_8.x86_64/bin/java
+
+
+- name: Enable the Sonarqube service
+  systemd:
+        state: started
+        enabled: yes
+        daemon_reload: yes
+        name: sonarqube
+
+...
