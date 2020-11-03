@@ -1,7 +1,7 @@
 galaxy_info:
   author: vyshnav vm
   description: ansible role to install and configure sonarqube on centos 7 and to add a sample webhook
-  company: your company (optional)
+  company: 
 
   # If the issue tracker for your role is not on github, uncomment the
   # next line and provide a value
@@ -14,7 +14,7 @@ galaxy_info:
   # - GPL-3.0-only
   # - Apache-2.0
   # - CC-BY-4.0
-  license: license (GPL-2.0-or-later, MIT, etc)
+  license: license
 
   min_ansible_version: 2.9
 
@@ -28,7 +28,7 @@ galaxy_info:
   # https://galaxy.ansible.com/api/v1/platforms/
   #
   platforms:
-  - name: centos
+  - name: CentOS
     versions:
     - 7
   # - name: SomePlatform
